@@ -5,3 +5,4 @@ Try running the following, you can edit the plot style and colours using the `.y
 `"python analysis_script.py user_config.yaml job_config.yaml sector"`
 `"python analysis_script.py user_config.yaml job_config.yaml occupancy_date"`
 
+The script now contains logging, try and except block and error checking in the form of assertions.
