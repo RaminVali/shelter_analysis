@@ -14,12 +14,16 @@ import yaml
 import logging
 
 ## Loading ##
-def load_data():
+def load_data(path):
     '''The link to the dataset is one of the varibales we can put into user config'''
-    df = pd.read_csv(config['dataset_url'])# job config variable
+    df = pd.read_csv(path)
     # df = pd.read_csv('data.csv')
     assert isinstance(df, pd.DataFrame),'error loading shelter_data, not a dataframe'
-    logging.info(f"Data loaded from {config['dataset_url']}")
+
+    if df.shape[1] !=  32: # cheking df _shape
+        raise ValueError('Dataframe has unexpected number of columns')
+
+    logging.info(f"Data loaded from {path}")
     return df
 
 ## Preprocessing ##
@@ -33,9 +37,12 @@ def null_col_drop(df, pct = 0.35):
 
 def preprocess(df):
     '''Change column names to lower case and drop nulls and set the datetime column'''
-    df['OCCUPANCY_DATE'] = pd.to_datetime(df['OCCUPANCY_DATE']) # Get date time object
     df = df.rename(columns=str.lower) # rename columns to lower case
+    df['occupancy_date'] = pd.to_datetime(df['occupancy_date']) # Get date time object
     df = null_col_drop(df, pct = 0.35)
+
+    if df.shape[1] != 26: # cheking df shape after deleting nulls
+        raise ValueError('Dataframe has unexpected shape post cleanup')
     
     assert 'capacity_actual_bed' in df.columns, "error: missing capacity_actual_bed"
     assert 'occupied_beds' in df.columns, "error: missing occupied_beds"
@@ -121,7 +128,7 @@ def sector_boxplot(data):
 
 def main():
     try:
-        df = load_data()
+        df = load_data(config['dataset_url'])
         # df = None  # testing the try and except
         prepped_df = preprocess(df) 
         analysis_and_plot (prepped_df)
