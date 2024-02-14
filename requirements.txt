@@ -2,5 +2,4 @@ pytest
 pandas
 matplotlib
 argparse
-yaml
 logging
